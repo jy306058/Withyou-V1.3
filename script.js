@@ -202,7 +202,8 @@ function updateProgressBar(percent) {
 }
 
 function renderTimer() {
-    const timeDisplay = document.getElementById('timer-time');
+    const timeDisplayMin = document.getElementById('timer-time-min');
+    const timeDisplaySec = document.getElementById('timer-time-sec');
     const container = document.getElementById('timer-container');
     const lapContainer = document.getElementById('lap-container');
     const lapButton = document.getElementById('timer-lap');
@@ -231,7 +232,12 @@ function renderTimer() {
         renderLaps();
     }
 
-    timeDisplay.textContent = formatTime(currentSeconds);
+    if (timeDisplayMin && timeDisplaySec) {
+        const m = Math.floor(currentSeconds / 60);
+        const s = currentSeconds % 60;
+        timeDisplayMin.textContent = String(m).padStart(2, '0');
+        timeDisplaySec.textContent = String(s).padStart(2, '0');
+    }
     updateProgressBar(percent);
 
     const startBtn = document.getElementById('timer-start');
@@ -427,13 +433,6 @@ function handleLap() {
 
 function setMode(mode) {
     if (currentMode === mode) {
-        if (mode === MODES.TIMER) {
-            const val = prompt('몇 분으로 설정할까요?', '25');
-            const mins = parseInt(val) || 25;
-            timerState.seconds = mins * 60;
-            timerState.initialSeconds = mins * 60;
-            resetEngine();
-        }
         return;
     }
     stopEngine();
@@ -445,10 +444,7 @@ function setMode(mode) {
     });
     
     if (mode === MODES.TIMER) {
-        const val = prompt('몇 분으로 설정할까요?', '25');
-        const mins = parseInt(val) || 25;
-        timerState.seconds = mins * 60;
-        timerState.initialSeconds = mins * 60;
+        // Defaults to existing timerState, prompts removed
     }
     renderTimer();
 }
@@ -462,7 +458,10 @@ function renderChecklist() {
         Work: '💻',
         Study: '✏️',
         Reading: '📖',
-        Etc: '💡'
+        Exercise: '🏋️',
+        Rest: '☕',
+        Game: '🕹️',
+        Etc: '☑️'
     };
 
     const filteredTasks = state.tasks.filter(t => {
@@ -779,8 +778,94 @@ function setupEventListeners() {
         }
     });
 
-    // 🔥 수동 닫기 버튼 이벤트 연결
     document.getElementById('remind-bubble-close').onclick = closeRemindBubble;
+
+    // Inline Timer Editing Logic (Split Min/Sec)
+    const partMin = document.getElementById('timer-part-min');
+    const partSec = document.getElementById('timer-part-sec');
+    const displayMin = document.getElementById('timer-time-min');
+    const displaySec = document.getElementById('timer-time-sec');
+    const inputMin = document.getElementById('timer-input-min');
+    const inputSec = document.getElementById('timer-input-sec');
+
+    const updateTimerFromInputs = () => {
+        let m = parseInt(inputMin.value) || 0;
+        let s = parseInt(inputSec.value) || 0;
+        if (s > 59) s = 59;
+        let totalSecs = (m * 60) + s;
+        if (totalSecs > 180 * 60) totalSecs = 180 * 60;
+        
+        timerState.seconds = totalSecs;
+        timerState.initialSeconds = totalSecs;
+        resetEngine();
+    };
+
+    if (partMin && inputMin) {
+        partMin.onclick = () => {
+            if (currentMode !== MODES.TIMER || (isTimerRunning && !isTimerPaused)) return;
+            displayMin.style.display = 'none';
+            inputMin.style.display = 'inline-block';
+            inputMin.value = Math.floor(timerState.initialSeconds / 60);
+            inputMin.focus();
+            inputMin.select();
+        };
+        inputMin.onblur = () => {
+            inputMin.style.display = 'none';
+            displayMin.style.display = 'inline';
+            updateTimerFromInputs();
+        };
+        inputMin.onkeydown = (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); inputMin.blur(); }
+        };
+    }
+
+    if (partSec && inputSec) {
+        partSec.onclick = () => {
+            if (currentMode !== MODES.TIMER || (isTimerRunning && !isTimerPaused)) return;
+            displaySec.style.display = 'none';
+            inputSec.style.display = 'inline-block';
+            inputSec.value = timerState.initialSeconds % 60;
+            inputSec.focus();
+            inputSec.select();
+        };
+        inputSec.onblur = () => {
+            inputSec.style.display = 'none';
+            displaySec.style.display = 'inline';
+            updateTimerFromInputs();
+        };
+        inputSec.onkeydown = (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); inputSec.blur(); }
+        };
+    }
+
+    // Quick Settings Panel Logic
+    const quickSettingBtn = document.getElementById('timer-quick-setting-btn');
+    const quickSettingPanel = document.getElementById('timer-quick-settings-panel');
+    if (quickSettingBtn && quickSettingPanel) {
+        quickSettingBtn.onclick = () => {
+            if (currentMode !== MODES.TIMER || (isTimerRunning && !isTimerPaused)) {
+                alert('타이머가 정지된 상태에서만 설정할 수 있습니다.');
+                return;
+            }
+            const isVisible = quickSettingPanel.style.display === 'block';
+            quickSettingPanel.style.display = isVisible ? 'none' : 'block';
+        };
+
+        const presetRadios = document.querySelectorAll('input[name="quick-timer-preset"]');
+        presetRadios.forEach(radio => {
+            radio.onchange = (e) => {
+                if (e.target.checked) {
+                    const mins = parseInt(e.target.value);
+                    const totalSecs = mins * 60;
+                    timerState.seconds = totalSecs;
+                    timerState.initialSeconds = totalSecs;
+                    resetEngine();
+                    quickSettingPanel.style.display = 'none';
+                    e.target.checked = false; // reset selection
+                }
+            };
+        });
+    }
 }
 
 init();

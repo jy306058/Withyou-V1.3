@@ -52,8 +52,16 @@
 
 
                     <div class="timer__progress-wrapper">
-                        <div class="timer__display">
-                            <span id="timer-time">25:00</span>
+                        <div class="timer__display" id="timer-display-container">
+                            <div class="timer__time-part" id="timer-part-min" title="클릭하여 분 수정">
+                                <span id="timer-time-min">25</span>
+                                <input type="text" id="timer-input-min" class="timer__input-split" style="display:none;" maxlength="3">
+                            </div>
+                            <span class="timer__separator">:</span>
+                            <div class="timer__time-part" id="timer-part-sec" title="클릭하여 초 수정">
+                                <span id="timer-time-sec">00</span>
+                                <input type="text" id="timer-input-sec" class="timer__input-split" style="display:none;" maxlength="2">
+                            </div>
                         </div>
                         <div class="timer__bar-container">
                             <div class="timer__bar-fill" id="timer-bar-fill"></div>
@@ -65,6 +73,19 @@
                         <button id="timer-pause" class="button button--secondary" style="display:none;">일시정지</button>
                         <button id="timer-lap" class="button button--secondary" style="display:none;">Lap</button>
                         <button id="timer-reset" class="button button--secondary">리셋</button>
+                        <button id="timer-quick-setting-btn" class="button button--secondary">설정</button>
+                    </div>
+
+                    <div class="timer__quick-settings" id="timer-quick-settings-panel" style="display:none;">
+                        <p class="timer__quick-settings-title">타이머를 몇 분(시간)으로 설정하시겠어요?</p>
+                        <div class="timer__quick-options">
+                            <label class="interval__option"><input type="radio" name="quick-timer-preset" value="10"> 10분</label>
+                            <label class="interval__option"><input type="radio" name="quick-timer-preset" value="20"> 20분</label>
+                            <label class="interval__option"><input type="radio" name="quick-timer-preset" value="30"> 30분</label>
+                            <label class="interval__option"><input type="radio" name="quick-timer-preset" value="40"> 40분</label>
+                            <label class="interval__option"><input type="radio" name="quick-timer-preset" value="50"> 50분</label>
+                            <label class="interval__option"><input type="radio" name="quick-timer-preset" value="60"> 1시간</label>
+                        </div>
                     </div>
 
                     <div class="timer__modes">
@@ -82,13 +103,16 @@
                 </div>
                 <!-- Mindful Checklist -->
                 <aside class="checklist">
-                    <h2 class="checklist__title">체크리스트</h2>
+                    <h2 class="checklist__title">To-Do 리스트</h2>
                     <div class="checklist__categories">
                         <button class="category__button" data-category="All">전체 ✅</button>
                         <button class="category__button category__button--active" data-category="Work">업무 💻</button>
                         <button class="category__button" data-category="Study">공부 ✏️</button>
                         <button class="category__button" data-category="Reading">독서 📖</button>
-                        <button class="category__button" data-category="Etc">기타 💡</button>
+                        <button class="category__button" data-category="Exercise">운동 🏋️</button>
+                        <button class="category__button" data-category="Rest">휴식 ☕</button>
+                        <button class="category__button" data-category="Game">게임 🕹️</button>
+                        <button class="category__button" data-category="Etc">기타 ☑️</button>
                     </div>
                     
                     <div class="checklist__input-group">
