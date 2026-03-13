@@ -1299,6 +1299,13 @@ input:checked + .slider:before {
     background: var(--bg-color);
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.button--secondary:hover:not(#timer-reset) {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--accent-soft);
 }
 
 #timer-reset:hover {
@@ -1310,6 +1317,7 @@ input:checked + .slider:before {
 .timer__button--resume {
     color: #ffffff !important;
     border-color: #ffffff !important;
+    transition: all 0.2s ease;
 }
 
 .theme-light .timer__button--resume {
@@ -1318,7 +1326,9 @@ input:checked + .slider:before {
 }
 
 .timer__button--resume:hover {
-    background: rgba(148, 46, 244, 0.1) !important;
+    color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    background: var(--accent-soft) !important;
 }
 
 

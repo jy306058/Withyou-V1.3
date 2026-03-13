@@ -23,9 +23,9 @@ let state = {
         {
             name: '지윤',
             image: '', 
-            msgIdle: ['우리 같이 집중해 볼까요? 💙'],
+            msgIdle: ['우리 같이 집중해 볼까요?'],
             msgStart: ['오늘도 집중해서 잘해보자!'],
-            msgEnd: ['고생했어! 이제 나랑 푹 쉬자 💙'],
+            msgEnd: ['고생했어! 이제 나랑 푹 쉬자~'],
             msgClear: ['전부 다 해내다니, 역시 대단해!']
         }
     ],
@@ -562,19 +562,6 @@ function renderSettings() {
     }
 
     // Reminder messages are now per-profile
-}
-
-function renderRemindMessageSlots(messages) {
-    const container = document.getElementById('remind-msg-list');
-    container.innerHTML = '';
-    const list = messages.length > 0 ? messages : [''];
-    list.forEach(msg => createMessageBox(container, msg));
-}
-
-function addRemindMessageSlot() {
-    const container = document.getElementById('remind-msg-list');
-    if (container.children.length >= 10) return alert('최대 10개까지 등록 가능합니다.');
-    createMessageBox(container);
 }
 
 // --- MODALS ---
