@@ -301,6 +301,8 @@ img {
 /* Profile Avatar */
 .profile__avatar {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     margin-bottom: 0;
 }
@@ -327,6 +329,7 @@ img {
     font-weight: 700;
     color: var(--profile-name-color);
     letter-spacing: 0.5px;
+    text-align: center;
 }
 
 /* Timer */
