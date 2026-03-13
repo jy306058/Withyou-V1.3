@@ -130,6 +130,55 @@ function init() {
     applyTheme(state.settings.theme);
     renderAll();
     setupEventListeners();
+
+    // 🔥 Check for First-Time User Onboarding
+    const isOnboardingComplete = localStorage.getItem('onboarding_complete');
+    if (!isOnboardingComplete) {
+        showOnboarding();
+    }
+}
+
+function showOnboarding() {
+    const overlay = document.getElementById('onboarding-overlay');
+    const inputSection = document.getElementById('onboarding-step-input');
+    const welcomeSection = document.getElementById('onboarding-step-welcome');
+    const nameInput = document.getElementById('onboarding-nickname-input');
+    const submitBtn = document.getElementById('onboarding-submit');
+    const welcomeMsg = document.getElementById('onboarding-welcome-msg');
+
+    overlay.style.display = 'flex';
+    
+    const handleOnboardingSubmit = () => {
+        const nickname = nameInput.value.trim();
+        if (!nickname) {
+            alert('이름을 입력해 주세요!');
+            return;
+        }
+
+        // 1. Save Nickname to State
+        state.settings.nickname = nickname;
+        saveState();
+        renderAll();
+
+        // 2. Transition to Welcome Message
+        inputSection.style.display = 'none';
+        welcomeSection.style.display = 'flex';
+        welcomeMsg.textContent = `환영합니다, ${nickname}!`;
+
+        // 3. Complete Onboarding and Reveal Main Page
+        setTimeout(() => {
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                localStorage.setItem('onboarding_complete', 'true');
+            }, 800);
+        }, 2000);
+    };
+
+    submitBtn.onclick = handleOnboardingSubmit;
+    nameInput.onkeydown = (e) => {
+        if (e.key === 'Enter') handleOnboardingSubmit();
+    };
 }
 
 function loadState() {
