@@ -373,6 +373,25 @@
                 <button id="onboarding-character-submit" class="button button--primary mt-10">시작하기</button>
                 <button id="onboarding-skip" class="onboarding__skip-btn">건너뛰기</button>
             </div>
+
+            <!-- 새로 추가된 온보딩 3단계 (브릿지, 퀴즈, 결과) -->
+            <div id="onboarding-step-bridge" class="onboarding__content" style="display: none;">
+                <h2 id="onboarding-bridge-title" class="onboarding__title"></h2>
+                <p class="onboarding__text">우리는 얼마나 잘 맞을까?</p>
+                <button id="onboarding-bridge-submit" class="button button--primary mt-10">확인하기</button>
+            </div>
+
+            <div id="onboarding-step-quiz" class="onboarding__content" style="display: none;">
+                <p id="onboarding-quiz-question" class="onboarding__quiz-question"></p>
+                <input type="text" id="onboarding-quiz-input" class="form__input onboarding__input" placeholder="답변을 입력하세요" maxlength="30">
+                <button id="onboarding-quiz-submit" class="button button--primary mt-10">다음</button>
+            </div>
+
+            <div id="onboarding-step-result" class="onboarding__content" style="display: none;">
+                <h2 id="onboarding-result-text" class="onboarding__title" style="line-height: 1.4;"></h2>
+                <p class="onboarding__hint mt-10">이제 최애와의 집중을 시작해 보세요!</p>
+                <button id="onboarding-result-submit" class="button button--primary mt-10">시작하기</button>
+            </div>
         </div>
     </div>
 

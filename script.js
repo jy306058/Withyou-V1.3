@@ -148,13 +148,22 @@ function showOnboarding() {
     const welcomeMsg = document.getElementById('onboarding-welcome-msg');
     
     const charImg = document.getElementById('onboarding-character-img');
-    const charFile = document.getElementById('onboarding-character-file');
-    const charNameInput = document.getElementById('onboarding-character-name');
+    const stepBridge = document.getElementById('onboarding-step-bridge');
+    const stepQuiz = document.getElementById('onboarding-step-quiz');
+    const stepResult = document.getElementById('onboarding-step-result');
+    
+    const bridgeTitle = document.getElementById('onboarding-bridge-title');
+    const quizQuestion = document.getElementById('onboarding-quiz-question');
+    const quizInput = document.getElementById('onboarding-quiz-input');
+    const resultText = document.getElementById('onboarding-result-text');
     
     // 강제로 초기 상태 설정
     step1.style.display = 'flex';
     stepWelcome.style.display = 'none';
     step2.style.display = 'none';
+    stepBridge.style.display = 'none';
+    stepQuiz.style.display = 'none';
+    stepResult.style.display = 'none';
     overlay.style.display = 'flex';
 
     // 최애 이미지 미리보기
@@ -189,8 +198,86 @@ function showOnboarding() {
         }
         
         saveState();
-        renderAll();
-        finishOnboarding();
+        showBridgeScreen();
+    };
+
+    const handleStep2Skip = () => {
+        // 건너뛰기 시 기본값도 사용할 수 있도록 이름만 보장
+        if (!state.profiles[0].name) state.profiles[0].name = '지윤';
+        saveState();
+        showBridgeScreen();
+    };
+
+    const showBridgeScreen = () => {
+        const charName = state.profiles[0].name || '지윤';
+        bridgeTitle.textContent = `${charName}이/가 나의 메이트라면?`;
+        step2.style.display = 'none';
+        
+        stepBridge.style.animation = 'none';
+        stepBridge.style.display = 'flex';
+        void stepBridge.offsetWidth;
+        stepBridge.style.animation = 'fadeIn 0.5s forwards';
+    };
+
+    // --- Quiz Logic ---
+    const quizQuestions = [
+        (name) => `${name}이/가 나에게 인사를 건네온다면, 무슨 말을 할까?`,
+        (name) => `할 일 시작! ${name}(이)가 나에게 보내는 응원의 한 마디는?`,
+        (name) => `오늘도 열일했다~ ${name}(은)는 열심히 일한 내게 어떻게 말할까?`,
+        (name) => `${name}이/가 내게 칭찬의 한 마디를 한다면?`,
+        (name) => `앗, 열일 중 ${name}에게 문자가 왔다! 과연 뭐라고 왔을까?`
+    ];
+    const quizKeys = ['msgIdle', 'msgStart', 'msgEnd', 'msgClear', 'remindMessages'];
+    let currentQuizStep = 0;
+
+    const showQuizStep = () => {
+        const charName = state.profiles[0].name || '지윤';
+        quizQuestion.textContent = `${currentQuizStep + 1}. ${quizQuestions[currentQuizStep](charName)}`;
+        quizInput.value = ''; // 입력란 초기화
+        
+        const nextBtn = document.getElementById('onboarding-quiz-submit');
+        nextBtn.textContent = (currentQuizStep === 4) ? '확인' : '다음';
+        
+        stepBridge.style.display = 'none';
+        stepQuiz.style.animation = 'none';
+        stepQuiz.style.display = 'flex';
+        void stepQuiz.offsetWidth;
+        stepQuiz.style.animation = 'fadeIn 0.5s forwards';
+        quizInput.focus();
+    };
+
+    const handleQuizSubmit = () => {
+        const val = quizInput.value.trim();
+        if (val) {
+            state.profiles[0][quizKeys[currentQuizStep]] = [val];
+        }
+        
+        currentQuizStep++;
+        if (currentQuizStep >= quizQuestions.length) {
+            showResultScreen();
+        } else {
+            showQuizStep();
+        }
+    };
+
+    const showResultScreen = () => {
+        const results = [
+            "우리는 최고의 짝꿍!",
+            "저희 제법 잘 어울려요~",
+            "세상에서 제일 가는 파트너!",
+            "찰떡궁합, 쫀쫀한 케미!",
+            "함께라면 시너지 1000%!"
+        ];
+        resultText.textContent = results[Math.floor(Math.random() * results.length)];
+        
+        saveState();
+        renderAll(); // 모든 정보가 입력된 후 메인 화면 동기화
+        
+        stepQuiz.style.display = 'none';
+        stepResult.style.animation = 'none';
+        stepResult.style.display = 'flex';
+        void stepResult.offsetWidth;
+        stepResult.style.animation = 'fadeIn 0.5s forwards';
     };
 
     const handleStep1Submit = () => {
@@ -240,8 +327,22 @@ function showOnboarding() {
         }
     };
     
-    // 건너뛰기 버튼
-    document.getElementById('onboarding-skip').onclick = finishOnboarding;
+    // 건너뛰기 버튼 -> 브릿지로 이동
+    document.getElementById('onboarding-skip').onclick = handleStep2Skip;
+
+    // 온보딩 후반 로직 바인딩
+    document.getElementById('onboarding-bridge-submit').onclick = showQuizStep;
+    
+    document.getElementById('onboarding-quiz-submit').onclick = handleQuizSubmit;
+    quizInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleQuizSubmit();
+        }
+    };
+
+    // 최종 결과 화면에서 시작하기
+    document.getElementById('onboarding-result-submit').onclick = finishOnboarding;
 }
 
 function loadState() {

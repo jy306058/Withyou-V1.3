@@ -1707,6 +1707,17 @@ input:checked + .slider:before {
     opacity: 1;
 }
 
+/* Onboarding Step 3: Quiz */
+.onboarding__quiz-question {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    line-height: 1.4;
+    word-break: keep-all;
+    text-align: center;
+    font-weight: 500;
+}
+
 .onboarding-overlay.fade-out {
     animation: fadeOut 0.8s forwards;
 }
