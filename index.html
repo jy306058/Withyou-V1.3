@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>With You | 최애와 함께 시작하는 집중의 시간</title>
     <meta name="description" content="최애 캐릭터/아이돌과 함께 공부와 작업에 집중할 수 있는 감성적인 타이머 웹앱">
-    <link rel="stylesheet" href="style.css?v=0314-2303">
+    <link rel="stylesheet" href="style.css?v=0314-2350">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="theme-light">
-    <!-- GNB: Global Navigation Bar -->
     <header class="gnb">
         <div class="gnb__container">
-            <h1 class="gnb__logo" id="nav-main" onclick="showPage('page-timer')">With You</h1>
+            <h1 class="gnb__logo" id="nav-main" onclick="showTab('tab-home')">With You</h1>
             <nav class="gnb__nav">
                 <button class="gnb__button" id="nav-profiles" title="프로필 관리">
                     <i class="fa-regular fa-address-book"></i>
@@ -24,24 +23,43 @@
         </div>
     </header>
 
-    <!-- Reminder Toast Notification -->
     <div id="remind-bubble" class="remind-bubble">
         <p id="remind-bubble-text" class="remind-bubble__text"></p>
         <button id="remind-bubble-close" class="remind-bubble__close">&times;</button>
     </div>
 
     <main class="app__main">
-        <!-- Main Timer Page -->
-        <section id="page-timer" class="page page--active">
+        <section id="tab-todo" class="tab-content" style="display: none;">
+            <aside class="checklist" style="margin: 0 auto;">
+                <h2 class="checklist__title">To-Do 리스트</h2>
+                <div class="checklist__categories">
+                    <button class="category__button category__button--active" data-category="All">전체 ✅</button>
+                    <button class="category__button" data-category="Work">업무 💻</button>
+                    <button class="category__button" data-category="Study">공부 ✏️</button>
+                    <button class="category__button" data-category="Reading">독서 📖</button>
+                    <button class="category__button" data-category="Exercise">운동 🏋️</button>
+                    <button class="category__button" data-category="Game">게임 🕹️</button>
+                    <button class="category__button" data-category="Etc">기타 ☑️</button>
+                </div>
+                
+                <div class="checklist__input-group">
+                    <input type="text" id="todo-input" placeholder="오늘 할 일은 무엇인가요?" class="checklist__input">
+                    <button id="todo-add" class="checklist__add-button">추가</button>
+                </div>
+
+                <ul id="todo-list" class="checklist__list">
+                    </ul>
+            </aside>
+        </section>
+
+        <section id="tab-home" class="tab-content tab-content--active">
             <div class="timer__section">
-                <!-- Greeting Bubble -->
                 <div class="greeting">
                     <div class="greeting__bubble">
                         <p id="greeting-text">오늘도 같이 힘내볼까? 💙</p>
                     </div>
                 </div>
 
-                <!-- Profile Image -->
                 <div class="profile__avatar" style="position: relative;">
                     <div class="profile__avatar-frame">
                         <img id="main-profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%23999'%3EProfile%3C/text%3E%3C/svg%3E" alt="최애 프로필">
@@ -49,10 +67,7 @@
                     <p id="main-profile-name" class="profile__main-name"></p>
                 </div>
 
-                <!-- Timer Display -->
                 <div class="timer__container" id="timer-container">
-
-
                     <div class="timer__progress-wrapper">
                         <div class="timer__display" id="timer-display-container">
                             <div class="timer__time-part" id="timer-part-min" title="클릭하여 분 수정">
@@ -98,52 +113,32 @@
 
                     <div class="timer__lap-container" id="lap-container" style="display:none;">
                         <h4 class="timer__lap-title">Laps</h4>
-                        <ul class="timer__lap-list" id="lap-list">
-                            <!-- Laps will be added here -->
-                        </ul>
+                        <ul class="timer__lap-list" id="lap-list"></ul>
                     </div>
                 </div>
-                <!-- Mindful Checklist -->
-                <aside class="checklist">
-                    <h2 class="checklist__title">To-Do 리스트</h2>
-                    <div class="checklist__categories">
-                        <button class="category__button category__button--active" data-category="All">전체 ✅</button>
-                        <button class="category__button" data-category="Work">업무 💻</button>
-                        <button class="category__button" data-category="Study">공부 ✏️</button>
-                        <button class="category__button" data-category="Reading">독서 📖</button>
-                        <button class="category__button" data-category="Exercise">운동 🏋️</button>
-                        <button class="category__button" data-category="Game">게임 🕹️</button>
-                        <button class="category__button" data-category="Etc">기타 ☑️</button>
-                    </div>
-                    
-                    <div class="checklist__input-group">
-                        <input type="text" id="todo-input" placeholder="오늘 할 일은 무엇인가요?" class="checklist__input">
-                        <button id="todo-add" class="checklist__add-button">추가</button>
-                    </div>
-
-                    <ul id="todo-list" class="checklist__list">
-                        <!-- Tasks will be injected here -->
-                    </ul>
-                </aside>
             </div>
         </section>
 
-        <!-- Profile Management Page -->
-        <section id="page-profiles" class="page">
+        <section id="tab-record" class="tab-content" style="display: none;">
+            <div class="record__container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 class="page__header-title" style="text-align: center; margin-top: 50px;">기록장</h2>
+                <p style="text-align: center; color: var(--text-hint); margin-top: 20px;">준비 중인 페이지입니다.</p>
+            </div>
+        </section>
+
+        <section id="page-profiles" class="page" style="display: none;">
             <header class="page__header">
                 <h2 class="page__header-title">나의 위드 메이트 (<span id="profile-count">0</span>명)</h2>
-                <button class="page__back-home">&lt; 홈으로</button>
+                <button class="page__back-home" onclick="showTab('tab-home')">&lt; 홈으로</button>
             </header>
             <div class="profile__grid" id="profile-grid">
-                <!-- Profile cards will be injected here -->
-            </div>
+                </div>
         </section>
 
-        <!-- Environment Setting Page -->
-        <section id="page-settings" class="page">
+        <section id="page-settings" class="page" style="display: none;">
             <header class="page__header">
                 <h2 class="page__header-title">환경 설정</h2>
-                <button class="page__back-home">&lt; 홈으로</button>
+                <button class="page__back-home" onclick="showTab('tab-home')">&lt; 홈으로</button>
             </header>
             <div class="settings__tabs">
                 <button class="settings__tab-btn settings__tab-btn--active" data-settings-tab="general">일반 설정</button>
@@ -211,12 +206,8 @@
                             <input type="number" id="settings-remind-custom" class="form__input" placeholder="분 단위를 입력하세요 (최대 180)" max="180">
                         </div>
                     </div>
-
-
                 </section>
-                </div> <!-- End General Panel -->
-
-                <div id="settings-panel-sound" class="settings__panel" style="display: none;">
+                </div> <div id="settings-panel-sound" class="settings__panel" style="display: none;">
                     <section class="settings__section">
                         <div class="sound__tabs">
                             <button class="sound__tab-btn sound__tab-btn--active" data-sound-tab="start">타이머 시작 시</button>
@@ -257,24 +248,29 @@
                             </div>
                         </div>
                     </section>
-                </div> <!-- End Sound Panel -->
-
-                <div class="settings__actions">
+                </div> <div class="settings__actions">
                     <button id="settings-save" class="button button--primary button--large">적용하기</button>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="footer__container">
-            <p class="footer__text">&copy; With You. 최애와 함께하는 특별한 시간.</p>
-        </div>
-    </footer>
+    <nav class="bottom-nav">
+        <button class="bottom-nav__item" onclick="showTab('tab-todo')" data-tab="tab-todo">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span class="bottom-nav__label">투두리스트</span>
+        </button>
+        <button class="bottom-nav__item bottom-nav__item--active" onclick="showTab('tab-home')" data-tab="tab-home">
+            <i class="fa-solid fa-stopwatch"></i>
+            <span class="bottom-nav__label">홈</span>
+        </button>
+        <button class="bottom-nav__item" onclick="showTab('tab-record')" data-tab="tab-record">
+            <i class="fa-solid fa-comment-dots"></i>
+            <span class="bottom-nav__label">기록장</span>
+        </button>
+    </nav>
 
-    <!-- Modals -->
     <div id="modal-overlay" class="modal__overlay">
-        <!-- Profile Edit Modal -->
         <div id="profile-modal" class="modal modal--profile">
             <button class="modal__close" id="profile-modal-close">&times;</button>
             <div class="modal__content">
@@ -327,7 +323,6 @@
             </div>
         </div>
 
-        <!-- Timer Finish Modal -->
         <div id="finish-modal" class="modal modal--finish">
             <div class="modal__content" style="position: relative;">
                 <div class="finish__avatar-wrapper">
@@ -345,7 +340,6 @@
 
     <div class="confetti-container"></div>
 
-    <!-- Onboarding Overlay -->
     <div id="onboarding-overlay" class="onboarding-overlay" style="display: none;">
         <div class="onboarding__popup">
             <div id="onboarding-step-input" class="onboarding__content">
@@ -373,7 +367,6 @@
                 <button id="onboarding-character-submit" class="button button--primary mt-10">시작하기</button>
             </div>
 
-            <!-- 새로 추가된 온보딩 3단계 (브릿지, 퀴즈, 결과) -->
             <div id="onboarding-step-bridge" class="onboarding__content" style="display: none;">
                 <h2 id="onboarding-bridge-title" class="onboarding__title"></h2>
                 <p class="onboarding__text">우리는 얼마나 잘 맞을까?</p>

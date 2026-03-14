@@ -230,8 +230,6 @@ function showOnboarding() {
         showBridgeScreen();
     };
 
-    // handleStep2Skip 제거됨 (사용자가 이름을 반드시 입력하도록 변경)
-
     const showBridgeScreen = () => {
         const charName = state.profiles[0].name || '최애';
         bridgeTitle.textContent = `${charName}이/가 나의 메이트라면?`;
@@ -364,8 +362,6 @@ function showOnboarding() {
         }
     };
     
-    // 건너뛰기 버튼 제거됨 (handleStep2Skip 삭제)
-
     // 온보딩 후반 로직 바인딩
     document.getElementById('onboarding-bridge-submit').onclick = showQuizStep;
     
@@ -403,25 +399,35 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// --- NAVIGATION & THEME ---
-window.showPage = function(pageId) {
-    // 🎵 Stop sound preview when leaving the current page
+// --- 🔥 탭 전환 로직 (신규 추가!) ---
+window.showTab = function(tabId) {
+    // 🎵 오디오 미리듣기 끄기
     if (previewAudio) {
         previewAudio.pause();
         previewAudio.currentTime = 0;
     }
 
-    console.log('Changing page to:', pageId);
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(p => p.classList.remove('page--active'));
-    
-    const target = document.getElementById(pageId);
+    // 1. 프로필/환경설정 등 덮어씌워진 페이지 숨기기
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('page--active');
+        p.style.display = 'none';
+    });
+
+    // 2. 모든 탭 숨기기
+    document.querySelectorAll('.tab-content').forEach(t => {
+        t.classList.remove('tab-content--active');
+        t.style.display = 'none';
+    });
+
+    // 3. 선택한 탭 보여주기
+    const target = document.getElementById(tabId);
     if (target) {
-        target.classList.add('page--active');
+        target.classList.add('tab-content--active');
+        target.style.display = (tabId === 'tab-home') ? 'flex' : 'block';
         window.scrollTo(0, 0);
 
-        // When returning to the timer page, randomize the idle greeting.
-        if (pageId === 'page-timer') {
+        // 홈(타이머) 탭으로 돌아왔을 때만 인사말 무작위 변경
+        if (tabId === 'tab-home') {
             if (!isTimerRunning && !isTimerPaused) {
                 const profile = state.profiles[state.currentProfileIndex] || state.profiles[0];
                 const nickname = state.settings.nickname || '사용자';
@@ -429,8 +435,39 @@ window.showPage = function(pageId) {
                 document.getElementById('greeting-text').textContent = formatMessage(nickname, msg);
             }
         }
-    } else {
-        console.error('Page element not found:', pageId);
+    }
+
+    // 4. 하단 네비게이션 아이콘 색상 활성화 업데이트
+    document.querySelectorAll('.bottom-nav__item').forEach(btn => {
+        btn.classList.toggle('bottom-nav__item--active', btn.dataset.tab === tabId);
+    });
+};
+
+// --- 기존 페이지(오버레이) 전환 로직 업데이트 ---
+window.showPage = function(pageId) {
+    if (previewAudio) {
+        previewAudio.pause();
+        previewAudio.currentTime = 0;
+    }
+
+    // 모든 탭 숨기기
+    document.querySelectorAll('.tab-content').forEach(t => {
+        t.classList.remove('tab-content--active');
+        t.style.display = 'none';
+    });
+
+    // 기존 페이지들 숨기기
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('page--active');
+        p.style.display = 'none';
+    });
+    
+    // 타겟 페이지 열기
+    const target = document.getElementById(pageId);
+    if (target) {
+        target.classList.add('page--active');
+        target.style.display = 'block';
+        window.scrollTo(0, 0);
     }
 };
 
@@ -514,6 +551,8 @@ function renderTimer() {
     const quickSettingBtn = document.getElementById('timer-quick-setting-btn');
     const quickSettingPanel = document.getElementById('timer-quick-settings-panel');
 
+    if (!lapContainer || !lapButton || !container) return; // 탭 이동 시 에러 방지용
+
     lapContainer.style.display = 'none';
     lapButton.style.display = 'none';
     // --- 설정 버튼 가시성 제어 ---
@@ -557,22 +596,25 @@ function renderTimer() {
     const startBtn = document.getElementById('timer-start');
     const pauseBtn = document.getElementById('timer-pause');
     
-    if (isTimerRunning) {
-        startBtn.style.display = 'none';
-        pauseBtn.style.display = 'inline-block';
-        const isResume = isTimerPaused;
-        pauseBtn.textContent = isResume ? '재시작' : '일시정지';
-        pauseBtn.classList.toggle('timer__button--resume', isResume);
-    } else {
-        startBtn.style.display = 'inline-block';
-        pauseBtn.style.display = 'none';
-        startBtn.textContent = '시작';
-        pauseBtn.classList.remove('timer__button--resume');
+    if (startBtn && pauseBtn) {
+        if (isTimerRunning) {
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+            const isResume = isTimerPaused;
+            pauseBtn.textContent = isResume ? '재시작' : '일시정지';
+            pauseBtn.classList.toggle('timer__button--resume', isResume);
+        } else {
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+            startBtn.textContent = '시작';
+            pauseBtn.classList.remove('timer__button--resume');
+        }
     }
 }
 
 function renderLaps() {
     const lapList = document.getElementById('lap-list');
+    if (!lapList) return;
     lapList.innerHTML = '';
     stopwatchState.laps.slice().reverse().forEach((lap, idx) => {
         const li = document.createElement('li');
@@ -885,6 +927,7 @@ function setMode(mode) {
 // --- CHECKLIST & PROFILES ---
 function renderChecklist() {
     const todoList = document.getElementById('todo-list');
+    if (!todoList) return;
     todoList.innerHTML = '';
     
     const categoryEmojiMap = {
@@ -920,6 +963,7 @@ function renderChecklist() {
 
 function renderProfileGrid() {
     const grid = document.getElementById('profile-grid');
+    if (!grid) return;
     grid.innerHTML = '';
     
     state.profiles.forEach((profile, idx) => {
@@ -948,32 +992,41 @@ function renderProfileGrid() {
     addCard.innerHTML = `<div class="profile__card-add-icon">+</div><div class="profile__card-name">새 프로필 추가하기</div>`;
     addCard.onclick = () => openProfileModal(-1);
     grid.appendChild(addCard);
-    document.getElementById('profile-count').textContent = state.profiles.length;
+    
+    const countEl = document.getElementById('profile-count');
+    if (countEl) countEl.textContent = state.profiles.length;
 }
 
 // --- SETTINGS ---
 function renderSettings() {
-    document.getElementById('settings-nickname').value = state.settings.nickname;
+    const nickEl = document.getElementById('settings-nickname');
+    if(nickEl) nickEl.value = state.settings.nickname;
+    
     const radio = document.querySelector(`input[name="theme"][value="${state.settings.theme}"]`);
     if (radio) radio.checked = true;
 
     // Reminder settings
     const remindToggle = document.getElementById('settings-remind-toggle');
-    remindToggle.checked = !!state.settings.isRemindEnabled;
-    document.getElementById('remind-interval-area').style.display = remindToggle.checked ? 'block' : 'none';
+    if(remindToggle) {
+        remindToggle.checked = !!state.settings.isRemindEnabled;
+        document.getElementById('remind-interval-area').style.display = remindToggle.checked ? 'block' : 'none';
+    }
     
     const interval = state.settings.remindInterval || 30;
     const intervalRadio = document.querySelector(`input[name="remind-interval"][value="${interval}"]`);
     if (intervalRadio) {
         intervalRadio.checked = true;
-        document.getElementById('custom-interval-input-area').style.display = 'none';
+        const customArea = document.getElementById('custom-interval-input-area');
+        if(customArea) customArea.style.display = 'none';
     } else {
-        document.querySelector('input[name="remind-interval"][value="custom"]').checked = true;
-        document.getElementById('custom-interval-input-area').style.display = 'block';
-        document.getElementById('settings-remind-custom').value = interval;
+        const customRadio = document.querySelector('input[name="remind-interval"][value="custom"]');
+        if(customRadio) customRadio.checked = true;
+        const customArea = document.getElementById('custom-interval-input-area');
+        if(customArea) {
+            customArea.style.display = 'block';
+            document.getElementById('settings-remind-custom').value = interval;
+        }
     }
-
-    // Reminder messages are now per-profile
 }
 
 // --- MODALS ---
@@ -999,6 +1052,7 @@ function openProfileModal(index) {
 
 function renderMessageSlots(category, messages) {
     const container = document.getElementById(`msg-${category}-list`);
+    if (!container) return;
     container.innerHTML = '';
     const list = messages.length > 0 ? messages : [''];
     list.forEach(msg => createMessageBox(container, msg));
@@ -1073,8 +1127,6 @@ function closeModals() {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-    // Standard listeners are maintained for redundancy, 
-    // but index.html now uses global showPage directly for GNB to avoid any capture issue.
     const navProfiles = document.getElementById('nav-profiles');
     if (navProfiles) navProfiles.onclick = () => {
         playNewClickSound();
@@ -1097,11 +1149,27 @@ function setupEventListeners() {
         };
     }
     
+    // 로고 클릭 시 홈 탭으로
     const navMain = document.getElementById('nav-main');
     if (navMain) navMain.onclick = () => {
-        // [사용자 요청] 로고 클릭 시에는 사운드 재생 안 함
-        window.showPage('page-timer');
+        window.showTab('tab-home');
     };
+
+    // 하단 네비게이션 버튼들 이벤트 연결
+    document.querySelectorAll('.bottom-nav__item').forEach(btn => {
+        btn.onclick = () => {
+            playNewClickSound();
+            window.showTab(btn.dataset.tab);
+        };
+    });
+
+    // 뒤로가기 버튼들 홈 탭으로 연결
+    document.querySelectorAll('.page__back-home').forEach(btn => {
+        btn.onclick = () => {
+            playNewClickSound();
+            window.showTab('tab-home');
+        };
+    });
     
     document.getElementById('timer-start').onclick = startEngine;
     document.getElementById('timer-pause').onclick = pauseEngine;
@@ -1119,13 +1187,6 @@ function setupEventListeners() {
         btn.onclick = () => {
             playNewClickSound();
             setMode(btn.dataset.mode);
-        };
-    });
-
-    document.querySelectorAll('.page__back-home').forEach(btn => {
-        btn.onclick = () => {
-            playNewClickSound();
-            window.showPage('page-timer');
         };
     });
 
@@ -1186,55 +1247,64 @@ function setupEventListeners() {
     document.getElementById('profile-modal-close').onclick = closeModals;
     document.getElementById('finish-modal-close').onclick = closeModals;
 
-    document.getElementById('profile-img-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (rev) => { document.getElementById('profile-edit-preview').src = rev.target.result; };
-            reader.readAsDataURL(file);
-        }
-    };
+    const profileInput = document.getElementById('profile-img-input');
+    if(profileInput) {
+        profileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (rev) => { document.getElementById('profile-edit-preview').src = rev.target.result; };
+                reader.readAsDataURL(file);
+            }
+        };
+    }
 
-    document.getElementById('settings-save').onclick = () => {
-        const nickname = document.getElementById('settings-nickname').value;
-        const theme = document.querySelector('input[name="theme"]:checked').value;
-        const isRemindEnabled = document.getElementById('settings-remind-toggle').checked;
-        
-        // 🔥 예외 처리 로직 추가 (빈칸이거나 문자를 입력했을 때)
-        let remindInterval = 30;
-        const intervalTypeElement = document.querySelector('input[name="remind-interval"]:checked');
-        const intervalType = intervalTypeElement ? intervalTypeElement.value : '30';
-        if (intervalType === 'custom') {
-            const customVal = parseInt(document.getElementById('settings-remind-custom').value);
-            remindInterval = (isNaN(customVal) || customVal <= 0) ? 30 : customVal;
-            if (remindInterval > 180) remindInterval = 180;
-        } else {
-            remindInterval = parseInt(intervalType);
-        }
+    const settingsSave = document.getElementById('settings-save');
+    if(settingsSave) {
+        settingsSave.onclick = () => {
+            const nickname = document.getElementById('settings-nickname').value;
+            const theme = document.querySelector('input[name="theme"]:checked').value;
+            const isRemindEnabled = document.getElementById('settings-remind-toggle').checked;
+            
+            // 🔥 예외 처리 로직 추가 (빈칸이거나 문자를 입력했을 때)
+            let remindInterval = 30;
+            const intervalTypeElement = document.querySelector('input[name="remind-interval"]:checked');
+            const intervalType = intervalTypeElement ? intervalTypeElement.value : '30';
+            if (intervalType === 'custom') {
+                const customVal = parseInt(document.getElementById('settings-remind-custom').value);
+                remindInterval = (isNaN(customVal) || customVal <= 0) ? 30 : customVal;
+                if (remindInterval > 180) remindInterval = 180;
+            } else {
+                remindInterval = parseInt(intervalType);
+            }
 
-        const sStart = document.querySelector('input[name="sound-start"]:checked');
-        const sEnd = document.querySelector('input[name="sound-end"]:checked');
-        const sPopup = document.querySelector('input[name="sound-popup"]:checked');
-        if (!state.settings.sounds) state.settings.sounds = {};
-        if (sStart) state.settings.sounds.start = sStart.value;
-        if (sEnd) state.settings.sounds.end = sEnd.value;
-        if (sPopup) state.settings.sounds.popup = sPopup.value;
+            const sStart = document.querySelector('input[name="sound-start"]:checked');
+            const sEnd = document.querySelector('input[name="sound-end"]:checked');
+            const sPopup = document.querySelector('input[name="sound-popup"]:checked');
+            if (!state.settings.sounds) state.settings.sounds = {};
+            if (sStart) state.settings.sounds.start = sStart.value;
+            if (sEnd) state.settings.sounds.end = sEnd.value;
+            if (sPopup) state.settings.sounds.popup = sPopup.value;
 
-        if (nickname) state.settings.nickname = nickname;
-        state.settings.theme = theme;
-        state.settings.isRemindEnabled = isRemindEnabled;
-        state.settings.remindInterval = remindInterval;
+            if (nickname) state.settings.nickname = nickname;
+            state.settings.theme = theme;
+            state.settings.isRemindEnabled = isRemindEnabled;
+            state.settings.remindInterval = remindInterval;
 
-        applyTheme(theme);
-        saveState();
-        renderAll();
-        alert('설정이 저장되었습니다.');
-    };
+            applyTheme(theme);
+            saveState();
+            renderAll();
+            alert('설정이 저장되었습니다.');
+        };
+    }
 
-    document.getElementById('settings-remind-toggle').onchange = (e) => {
-        const isChecked = e.target.checked;
-        document.getElementById('remind-interval-area').style.display = isChecked ? 'block' : 'none';
-    };
+    const remindToggle = document.getElementById('settings-remind-toggle');
+    if(remindToggle) {
+        remindToggle.onchange = (e) => {
+            const isChecked = e.target.checked;
+            document.getElementById('remind-interval-area').style.display = isChecked ? 'block' : 'none';
+        };
+    }
 
     document.querySelectorAll('input[name="remind-interval"]').forEach(radio => {
         radio.onchange = (e) => {
@@ -1278,7 +1348,8 @@ function setupEventListeners() {
         });
     });
 
-    document.getElementById('remind-bubble-close').onclick = closeRemindBubble;
+    const remindCloseBtn = document.getElementById('remind-bubble-close');
+    if(remindCloseBtn) remindCloseBtn.onclick = closeRemindBubble;
 
     // Inline Timer Editing Logic (Split Min/Sec)
     const partMin = document.getElementById('timer-part-min');
