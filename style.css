@@ -1,4 +1,4 @@
-﻿* {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -693,7 +693,7 @@ img {
 }
 
 .todo__item-checkbox--checked::after {
-    content: '??;
+    content: '✅';
     font-size: 14px;
 }
 
@@ -1744,7 +1744,7 @@ input:checked + .slider:before {
     animation: fadeOut 0.8s forwards;
 }
 
-/* ??대㉧ ?먰삎 洹몃옒???좎뿰??*/
+/* 타이머 원형 그래프 영역 */
 .timer__circle-wrapper {
     width: 100%;
     max-width: 240px;
@@ -1773,19 +1773,19 @@ input:checked + .slider:before {
     to { opacity: 0; visibility: hidden; }
 }
 
-/* 媛ㅻ윮??Z ?대뱶 ??珥덉냼???붾㈃(380px ?댄븯) ???諛⑹뼱 諛?誘몄꽭 議곗젙 肄붾뱶 */
+/* 갤럭시 Z 폴드 등 초소형 화면(380px 이하) 대응 방어 및 미세 조정 코드 */
 @media (max-width: 380px) {
-    /* ?덉씠?꾩썐 ????怨듦컙 ?뺣낫 */
+    /* 레이아웃 상단 여백 공간 확보 */
     #page-timer .timer__section {
         margin-top: 25px !important;
     }
 
-    /* 由щ쭏?몃뱶 ?앹뾽 ?꾩튂 議곗젙 (GNB 媛由?諛⑹?) */
+    /* 리마인드 팝업 위치 조정 (GNB 가림 방지) */
     .remind-bubble--active {
         top: 85px !important;
     }
 
-    /* 1. ??대㉧ 而⑦듃濡?踰꾪듉: 以꾨컮轅??덉슜 諛??ш린 異뺤냼 */
+    /* 1. 타이머 컨트롤 버튼: 줄바꿈 허용 및 크기 축소 */
     .timer__controls {
         flex-wrap: wrap !important;
         gap: 6px !important;
@@ -1800,7 +1800,7 @@ input:checked + .slider:before {
         flex: 1 1 40%;
     }
 
-    /* 2. ?꾩껜 ?곷떒 怨듬갚 諛?而⑦뀒?대꼫 ?щ갚 異뺤냼 */
+    /* 2. 전체 상단 공백 및 컨테이너 여백 축소 */
     body {
         padding-top: 45px !important;
     }
@@ -1818,7 +1818,7 @@ input:checked + .slider:before {
         min-height: 60px !important;
     }
 
-    /* 3. '< ?덉쑝濡? 踰꾪듉 諛??ㅻ뜑 理쒖쟻??*/
+    /* 3. '< 홈으로' 버튼 및 헤더 최적화 */
     .page__back-home {
         padding: 4px 8px !important;
         font-size: 0.75rem !important;
@@ -1828,7 +1828,7 @@ input:checked + .slider:before {
         font-size: 1.2rem !important;
     }
 
-    /* 4. ?щ몢 '異붽?' 踰꾪듉: 以꾨컮轅?諛⑹? 諛??ш린 怨좎젙 */
+    /* 4. 투두 '추가' 버튼: 줄바꿈 방지 및 크기 고정 */
     .checklist__add-button {
         white-space: nowrap !important;
         flex-shrink: 0 !important;
@@ -1844,5 +1844,25 @@ input:checked + .slider:before {
     .checklist__title {
         font-size: 1.1rem !important;
         margin-bottom: 10px !important;
+    }
+}
+/* ----------------------------------------
+   데스크탑 (PC) 전용 안전 여백 및 중앙 고정 
+   (절대 디자인 엎지 않음, 여백만 줌!)
+---------------------------------------- */
+@media (min-width: 1025px) {
+    /* 1. GNB(상단바) 아래로 시원한 여백 추가 */
+    #page-timer .timer__section {
+        margin-top: 60px !important; 
+    }
+
+    /* 2. 화면이 넓어져도 찢어지지 않게 500px 락 걸고 중앙 배치 */
+    .greeting, 
+    .profile__avatar, 
+    .timer__container, 
+    .checklist {
+        max-width: 500px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 }
