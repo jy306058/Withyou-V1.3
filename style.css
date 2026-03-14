@@ -1866,3 +1866,7 @@ input:checked + .slider:before {
         margin-right: auto !important;
     }
 }
+/* 프로필 관리 & 환경설정 헤더 밑 간격 시원하게 띄우기 */
+.page__header {
+    margin-bottom: 50px !important; 
+}
