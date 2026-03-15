@@ -677,7 +677,7 @@ img {
 }
 
 .todo__item-checkbox--checked::after {
-    content: '✅';
+    content: '';
     font-size: 14px;
 }
 
@@ -1889,6 +1889,11 @@ input:checked + .slider:before {
         margin-right: auto !important;
     }
 }
+
+/* 환경설정 하단 여백 추가 (네비게이션 바가림 방지) */
+.settings__container {
+    padding-bottom: 80px !important;
+}
 /* 2. 하단 네비게이션 바 디자인 (배경은 100%, 아이콘은 중앙 정렬!) */
 .bottom-nav {
     position: fixed;
@@ -1954,7 +1959,7 @@ input:checked + .slider:before {
 
 /* 1. GNB 아래 여백 절대 보장 (모든 기기 공통, 미디어 쿼리 무시) */
 html body .app__main #tab-home .timer__section {
-    margin-top: 60px !important; /* 냥이 머리 위로 시원하게 60px 확보! */
+    margin-top: 60px !important; /* 팝업창 사진 위로 시원하게 40px 확보! */
 }
 
 /* 2. 팝업창 무조건 최상단 배치 및 위치 조정 */
